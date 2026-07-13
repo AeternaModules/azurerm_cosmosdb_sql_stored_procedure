@@ -18,26 +18,13 @@ EOT
     name                = string
     resource_group_name = string
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_stored_procedures : (
-        length(v.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_stored_procedures : (
-        length(v.body) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_cosmosdb_sql_stored_procedure's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: resource_group_name
   #   condition: length(value) <= 90
   #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
@@ -54,6 +41,9 @@ EOT
   #   source:    [from resourcegroups.ValidateName] !matched
   # path: account_name
   #   source:    [from validate.CosmosAccountName] !matched
+  # path: body
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: container_name
   #   source:    [from validate.CosmosEntityName] len(value) < 1 || len(value) > 255
   # path: database_name
